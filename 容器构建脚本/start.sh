@@ -60,11 +60,11 @@ else
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             "$RCLONE_CONF_URL" -o ${DRIVE_DIR}/rclone/rclone.conf; then
             log success "rclone 配置文件下载成功"
-            NEW_HASH=$(sha256sum ${DRIVE_DIR}/rclone/rclone.conf | cut -d' ' -f1)
-            if grep -q "^CONFIG_RCLONE_HASH=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
-                sed -i "s|^CONFIG_RCLONE_HASH=.*|CONFIG_RCLONE_HASH=${NEW_HASH}|" "${DRIVE_DIR}/version.txt"
+            local now; now=$(date '+%Y-%m-%d %H:%M:%S')
+            if grep -q "^UPDATED_RCLONE_CONFIG=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
+                sed -i "s|^UPDATED_RCLONE_CONFIG=.*|UPDATED_RCLONE_CONFIG=${now}|" "${DRIVE_DIR}/version.txt"
             else
-                echo "CONFIG_RCLONE_HASH=${NEW_HASH}" >> "${DRIVE_DIR}/version.txt"
+                echo "UPDATED_RCLONE_CONFIG=${now}" >> "${DRIVE_DIR}/version.txt"
             fi
         else
             log error "rclone 配置文件下载失败，请检查 GITHUB_TOKEN 是否有效"

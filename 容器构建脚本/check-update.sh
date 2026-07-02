@@ -146,7 +146,7 @@ check_and_update() {
 # --------------------------------------------------
 # 检查并更新 rclone 配置文件
 # 从私有 GitHub 仓库下载，需要 GITHUB_TOKEN 环境变量
-# 通过 SHA256 检测变更
+# 通过文件内容比对检测变更
 # --------------------------------------------------
 check_rclone_config() {
     local config_url="https://raw.githubusercontent.com/xct258/Documentation/main/rclone/rclone.conf"
@@ -167,18 +167,8 @@ check_rclone_config() {
         return 1
     }
 
-    # 计算最新配置文件的 SHA256
-    local new_hash
-    new_hash=$(sha256sum "$tmp_config" | cut -d' ' -f1)
-
-    # 读取 version.txt 中记录的旧哈希
-    local old_hash=""
-    if [ -f "${DRIVE_DIR}/version.txt" ]; then
-        old_hash=$(grep "^CONFIG_RCLONE_HASH=" "${DRIVE_DIR}/version.txt" | cut -d'=' -f2)
-    fi
-
-    # 比较哈希值
-    if [ "$new_hash" = "$old_hash" ] && [ -f "$config_path" ]; then
+    # 与当前文件比较，判断是否有变更
+    if [ -f "$config_path" ] && cmp -s "$tmp_config" "$config_path"; then
         log info "[rclone-config] 配置文件无变化，跳过更新"
         rm -f "$tmp_config"
         return 0
@@ -189,16 +179,9 @@ check_rclone_config() {
     mkdir -p "$(dirname "$config_path")"
     cp "$tmp_config" "$config_path"
 
-    # 更新 version.txt 中的哈希值
+    # 更新 rclone 配置最后更新时间
     local now
     now=$(date '+%Y-%m-%d %H:%M:%S')
-    if grep -q "^CONFIG_RCLONE_HASH=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
-        sed -i "s|^CONFIG_RCLONE_HASH=.*|CONFIG_RCLONE_HASH=${new_hash}|" "${DRIVE_DIR}/version.txt"
-    else
-        echo "CONFIG_RCLONE_HASH=${new_hash}" >> "${DRIVE_DIR}/version.txt"
-    fi
-
-    # 更新 rclone 配置最后更新时间
     if grep -q "^UPDATED_RCLONE_CONFIG=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
         sed -i "s|^UPDATED_RCLONE_CONFIG=.*|UPDATED_RCLONE_CONFIG=${now}|" "${DRIVE_DIR}/version.txt"
     else
@@ -206,7 +189,7 @@ check_rclone_config() {
     fi
 
     rm -f "$tmp_config"
-    log info "[rclone-config] 配置文件已更新 (SHA256: ${new_hash})"
+    log info "[rclone-config] 配置文件已更新"
     return 2
 }
 
