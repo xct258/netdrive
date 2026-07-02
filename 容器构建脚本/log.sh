@@ -136,6 +136,7 @@ log() {
 
   # --- 核心改动：优先使用环境变量作为基础名称 ---
   base="${LOG_APP_NAME:-$(_log_get_caller_base)}"
+  local tag="$(_log_get_caller_base)"
   # 如果外部定义了 LOG_APP_NAME 则使用它，否则使用调用脚本的文件名
 
   # 分配 Emoji 和 终端颜色
@@ -163,8 +164,8 @@ log() {
     mkdir -p "$log_dir"
     # 创建目录，包含中间不存在的目录
 
-    local unique_id="${base}_$(date '+%H时%M分%S秒')_$$"
-    # 生成日志文件名唯一标识，包含应用名 + 当前时间时分秒 + 当前进程号
+    local unique_id="${tag}_$(date '+%H时%M分%S秒')_$$"
+    # 生成日志文件名唯一标识，包含脚本名 + 当前时间时分秒 + 当前进程号
 
     _log_file_map[$base]="$log_dir/${unique_id}.log"
     # 记录当前应用对应的日志文件完整路径
@@ -178,11 +179,11 @@ log() {
   # 生成当前时间戳，格式为 年-月-日 时:分:秒
   
   # 1. 组装纯文本日志，追加到日志文件
-  local plain_log="[$ts] [$base] $symbol $message"
+  local plain_log="[$ts] [$tag] $symbol $message"
   echo "$plain_log" >> "$log_file"
 
   # 2. 控制台输出逻辑（已根据你的需求简化）
-  local colored_log="${color_code}[$ts] [$base] $symbol $message${color_reset}"
+  local colored_log="${color_code}[$ts] [$tag] $symbol $message${color_reset}"
   
   if [ -t 1 ] || [ "$force_print" -eq 1 ]; then
     # 只要在终端环境，或者加了强制参数 -f，就直接像普通 echo 一样输出到标准输出
