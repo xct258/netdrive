@@ -60,7 +60,7 @@ else
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             "$RCLONE_CONF_URL" -o ${DRIVE_DIR}/rclone/rclone.conf; then
             log success "rclone 配置文件下载成功"
-            local now; now=$(date '+%Y-%m-%d %H:%M:%S')
+            now=$(date '+%Y-%m-%d %H:%M:%S')
             if grep -q "^UPDATED_RCLONE_CONFIG=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
                 sed -i "s|^UPDATED_RCLONE_CONFIG=.*|UPDATED_RCLONE_CONFIG=${now}|" "${DRIVE_DIR}/version.txt"
             else
