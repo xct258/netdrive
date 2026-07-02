@@ -180,8 +180,8 @@ VERSION_RCLONE=${version_rclone}
 LAST_CHECK=
 
 # 各组件最后更新时间
-UPDATED_OPENLIST=
-UPDATED_FILEBROWSER=
+UPDATED_OPENLIST=${build_date}
+UPDATED_FILEBROWSER=${build_date}
 EOF
 
 # 清理 apt 缓存，减小镜像体积
