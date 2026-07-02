@@ -7,13 +7,6 @@
 readonly _LOG_LOADED=1
 # 设置 _LOG_LOADED 为只读变量并赋值为1，标记脚本已加载
 
-# 日志保留数量：支持外部通过 LOG_MAX_FILES 环境变量指定，未指定则默认为 30
-_log_max_files="${LOG_MAX_FILES:-30}"
-
-# 默认日志目录：支持外部通过 LOG_BASE_DIR 环境变量指定
-_log_base_dir="${LOG_BASE_DIR:-$(cd "$(dirname "${BASH_SOURCE[2]:-${BASH_SOURCE[1]}}")" && pwd)/logs}"
-# 获取当前脚本所在目录，拼接 logs 文件夹路径，作为日志存储根目录
-
 # 作用域限制变量
 declare -gA _log_cleanup_done_map
 declare -gA _log_file_map
@@ -36,7 +29,7 @@ _log_cleanup_once() {
 
   if [[ -z "${_log_cleanup_done_map[$base]}" ]]; then
     # 如果该 base 日志目录还没清理过，则进行清理
-    local dir="$_log_base_dir/$base"
+    local dir="${LOG_BASE_DIR:-$(cd "$(dirname "${BASH_SOURCE[3]:-${BASH_SOURCE[2]}}")" && pwd)/logs}/$base"
     # 拼接具体日志目录路径
 
     if [[ -d "$dir" ]]; then
@@ -44,7 +37,7 @@ _log_cleanup_once() {
 
       find "$dir" -type f -name "*.log" -printf '%T@ %p\n' | sort -nr | \
       # 查找所有日志文件，按文件修改时间（时间戳）排序，最新排前面
-      tail -n +$((_log_max_files + 1)) | awk '{print $2}' | xargs -r rm -f --
+      tail -n +$(( ${LOG_MAX_FILES:-30} + 1 )) | awk '{print $2}' | xargs -r rm -f --
       # 保留最新的 _log_max_files 个日志，删除更旧的日志文件
 
       find "$dir" -type d -empty -delete
@@ -164,7 +157,7 @@ log() {
     ts_dir="$(date '+%Y/%m/%d')"
     # 生成按年月日划分的目录结构，如 2026/07/02
 
-    log_dir="$_log_base_dir/$base/$ts_dir"
+    log_dir="${LOG_BASE_DIR:-$(cd "$(dirname "${BASH_SOURCE[2]:-${BASH_SOURCE[1]}}")" && pwd)/logs}/$base/$ts_dir"
     # 拼接完整日志目录路径：基础日志目录 + 应用名 + 日期目录
 
     mkdir -p "$log_dir"
