@@ -42,8 +42,8 @@ RUN apt install -y wget \
     && rm -rf /root/tmp \
     # 下载容器入口脚本到 /usr/local/bin
     && wget -O /usr/local/bin/start.sh https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/容器构建脚本/start.sh \
-    && chmod +x /usr/local/bin/start.sh
-    && rm -rf /var/lib/apt/lists/* \
+    && chmod +x /usr/local/bin/start.sh \
+    && rm -rf /var/lib/apt/lists/*
 # --------------------------------------------------
 # 设置容器启动时执行的入口脚本
 # --------------------------------------------------
