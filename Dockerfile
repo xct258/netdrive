@@ -18,7 +18,7 @@ ENV GITHUB_REPO=${GITHUB_REPO}
 # LANG=zh_CN.UTF-8     - 中文 UTF-8 编码
 # TZ=Asia/Shanghai     - 中国标准时间（东八区）
 # --------------------------------------------------
-RUN apt-get update && apt-get install -y locales tzdata && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y locales tzdata \
     # 生成中文 locale（zh_CN.UTF-8）
     && localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8
 
@@ -43,7 +43,7 @@ RUN apt install -y wget \
     # 下载容器入口脚本到 /usr/local/bin
     && wget -O /usr/local/bin/start.sh https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/容器构建脚本/start.sh \
     && chmod +x /usr/local/bin/start.sh
-
+    && rm -rf /var/lib/apt/lists/* \
 # --------------------------------------------------
 # 设置容器启动时执行的入口脚本
 # --------------------------------------------------
