@@ -138,13 +138,17 @@ echo "rclone 安装完成 ($(rclone version | head -1))"
 # 这些脚本在容器启动时被 start.sh 调用
 # --------------------------------------------------
 echo "正在下载相关脚本..."
-for script in check-update.sh start-services.sh log.sh; do
+for script in check-update.sh start-services.sh; do
     wget -q --tries=3 -O "/usr/local/bin/${script}" \
         "https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/容器构建脚本/${script}"
     chmod +x "/usr/local/bin/${script}"
 done
 echo "相关脚本下载完成"
-
+# 下载日志脚本
+wget -q --tries=3 -O "/usr/local/bin/${script}" \
+    "https://raw.githubusercontent.com/${GITHUB_USER}/commom/main/sh脚本/log.sh"
+    chmod +x "/usr/local/bin/log.sh"
+echo "相关脚本下载完成"
 # --------------------------------------------------
 # 写入版本信息文件到 /app/version.txt
 # 该文件在容器首次启动时会被复制到 /rec/version.txt
