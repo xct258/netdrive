@@ -146,7 +146,7 @@ done
 echo "相关脚本下载完成"
 # 下载日志脚本
 wget -q --tries=3 -O "/usr/local/bin/log.sh" \
-    "https://raw.githubusercontent.com/${GITHUB_USER}/commom/main/脚本工具/shell/日志记录和推送/log.sh"
+    "https://raw.githubusercontent.com/${GITHUB_USER}/common/refs/heads/main/脚本工具/shell/日志记录和推送/log.sh"
     chmod +x "/usr/local/bin/log.sh"
 echo "相关脚本下载完成"
 # --------------------------------------------------
