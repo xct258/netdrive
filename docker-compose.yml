@@ -8,5 +8,5 @@ services:
       - GITHUB_TOKEN=
     volumes:
       - ./data:/rec        # 数据目录（配置/数据库/日志）
-      - /:/mnt             # 存储目录（FileBrowser 管理的根目录）
+      - /:/mnt             # 存储目录（宿主机根目录挂载）
     restart: always

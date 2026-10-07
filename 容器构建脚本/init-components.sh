@@ -43,20 +43,6 @@ latest_openlist_arm64_url=$(echo "$latest_release_openlist" | jq -r '.assets[] |
 echo "[OpenList] 最新版本: ${version_openlist}"
 
 # --------------------------------------------------
-# 从 GitHub API 获取 FileBrowser 最新版本信息
-# 仓库：filebrowser/filebrowser
-# 获取 x86_64 和 ARM64 两种架构的下载链接
-# --------------------------------------------------
-echo "[FileBrowser] 正在获取最新版本信息..."
-latest_release_filebrowser=$(curl -s --retry 3 --retry-delay 5 https://api.github.com/repos/filebrowser/filebrowser/releases/latest)
-version_filebrowser=$(echo "$latest_release_filebrowser" | jq -r '.tag_name')
-# x86_64 架构匹配 linux-amd64-filebrowser.tar.gz
-latest_filebrowser_x64_url=$(echo "$latest_release_filebrowser" | jq -r '.assets[] | select(.name | test("linux-amd64-filebrowser.tar.gz")) | .browser_download_url')
-# ARM64 架构匹配 linux-arm64-filebrowser.tar.gz
-latest_filebrowser_arm64_url=$(echo "$latest_release_filebrowser" | jq -r '.assets[] | select(.name | test("linux-arm64-filebrowser.tar.gz")) | .browser_download_url')
-echo "[FileBrowser] 最新版本: ${version_filebrowser}"
-
-# --------------------------------------------------
 # 从 GitHub API 获取 rclone 最新版本信息
 # 仓库：rclone/rclone
 # 获取 x86_64 和 ARM64 两种架构的下载链接
@@ -84,14 +70,12 @@ if [[ $arch == *"x86_64"* ]]; then
     echo "下载 x86_64 架构的组件..."
     wget --tries=3 -O /root/tmp/7zz.tar.xz "$latest_7z_x64_url"
     wget --tries=3 -O /root/tmp/openlist.tar.gz "$latest_openlist_x64_url"
-    wget --tries=3 -O /root/tmp/filebrowser.tar.gz "$latest_filebrowser_x64_url"
     wget --tries=3 -O /root/tmp/rclone.zip "$latest_rclone_x64_url"
 elif [[ $arch == *"aarch64"* ]]; then
     # 下载 ARM64 架构的二进制文件（带重试）
     echo "下载 ARM64 架构的组件..."
     wget --tries=3 -O /root/tmp/7zz.tar.xz "$latest_7z_arm64_url"
     wget --tries=3 -O /root/tmp/openlist.tar.gz "$latest_openlist_arm64_url"
-    wget --tries=3 -O /root/tmp/filebrowser.tar.gz "$latest_filebrowser_arm64_url"
     wget --tries=3 -O /root/tmp/rclone.zip "$latest_rclone_arm64_url"
 fi
 
@@ -106,18 +90,13 @@ mv /root/tmp/7zz /bin/7zz
 echo "7z 安装完成"
 
 # --------------------------------------------------
-# 安装 OpenList 和 FileBrowser
-# 分别解压到 /app/openlist 和 /app/filebrowser
+# 安装 OpenList
+# 解压到 /app/openlist
 # --------------------------------------------------
 echo "正在安装 OpenList..."
 mkdir -p /app/openlist
 tar -xf /root/tmp/openlist.tar.gz -C /app/openlist
 echo "OpenList 安装完成"
-
-echo "正在安装 FileBrowser..."
-mkdir -p /app/filebrowser
-tar -xf /root/tmp/filebrowser.tar.gz -C /app/filebrowser
-echo "FileBrowser 安装完成"
 
 # --------------------------------------------------
 # 安装 rclone
@@ -156,11 +135,9 @@ echo "相关脚本下载完成"
 #   BUILD_DATE          - 容器镜像构建时间
 #   VERSION_7Z          - 7z 版本号
 #   VERSION_OPENLIST    - OpenList 版本号
-#   VERSION_FILEBROWSER - FileBrowser 版本号
 #   VERSION_RCLONE      - rclone 版本号
 #   LAST_CHECK          - 上次检查更新时间（运行时填充）
 #   UPDATED_OPENLIST    - OpenList 最后更新时间（运行时填充）
-#   UPDATED_FILEBROWSER - FileBrowser 最后更新时间（运行时填充）
 # --------------------------------------------------
 build_date="$(date '+%Y-%m-%d %H:%M:%S')"
 
@@ -174,9 +151,6 @@ VERSION_7Z=${version_7z}
 # OpenList 版本
 VERSION_OPENLIST=${version_openlist}
 
-# FileBrowser 版本
-VERSION_FILEBROWSER=${version_filebrowser}
-
 # rclone 版本
 VERSION_RCLONE=${version_rclone}
 
@@ -185,7 +159,6 @@ LAST_CHECK=
 
 # 各组件最后更新时间
 UPDATED_OPENLIST=${build_date}
-UPDATED_FILEBROWSER=${build_date}
 EOF
 
 # 清理 apt 缓存，减小镜像体积
@@ -196,6 +169,5 @@ echo "  容器构建完成"
 echo "  构建时间: ${build_date}"
 echo "  7z: ${version_7z}"
 echo "  OpenList: ${version_openlist}"
-echo "  FileBrowser: ${version_filebrowser}"
 echo "  rclone: ${version_rclone}"
 echo "=========================================="

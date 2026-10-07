@@ -14,7 +14,6 @@ UPDATE_INTERVAL=$((15 * 24 * 60 * 60))
 cleanup() {
     log info "收到停止信号，正在关闭服务..."
     pkill -f "^/app/openlist/openlist" 2>/dev/null
-    pkill -f "^/app/filebrowser/filebrowser" 2>/dev/null
     exit 0
 }
 trap cleanup SIGTERM SIGINT SIGQUIT
@@ -36,7 +35,7 @@ export GITHUB_TOKEN
 # --------------------------------------------------
 # 初始化工作目录
 # --------------------------------------------------
-mkdir -p ${DRIVE_DIR}/openlist ${DRIVE_DIR}/filebrowser ${DRIVE_DIR}/rclone
+mkdir -p ${DRIVE_DIR}/openlist ${DRIVE_DIR}/rclone
 
 # --------------------------------------------------
 # 初始化版本信息
@@ -108,13 +107,6 @@ while true; do
                     sleep 2
                     bash ${DRIVE_START_SH_DIR}/start-services.sh openlist
                     log info "OpenList 已重启"
-                    ;;
-                FileBrowser)
-                    log info "重启 FileBrowser..."
-                    pkill -f "^/app/filebrowser/filebrowser" 2>/dev/null
-                    sleep 2
-                    bash ${DRIVE_START_SH_DIR}/start-services.sh filebrowser
-                    log info "FileBrowser 已重启"
                     ;;
                 Rclone)
                     log info "rclone 二进制已更新 (无需重启)"

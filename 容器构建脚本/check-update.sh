@@ -2,7 +2,7 @@
 
 # ============================================================
 # 容器构建脚本 - 组件更新检查
-# 功能：检查 OpenList 和 FileBrowser 是否有新版本，
+# 功能：检查 OpenList 是否有新版本，
 #       有则自动下载更新，并记录版本号和更新时间到 version.txt
 # ============================================================
 
@@ -32,7 +32,7 @@ version_gt() {
 # --------------------------------------------------
 # 检查并更新单个组件
 # 参数：
-#   $1 - 组件名称（如 OpenList / FileBrowser）
+#   $1 - 组件名称（如 OpenList）
 #   $2 - GitHub 仓库（user/repo）
 #   $3 - version.txt 中对应的版本变量名
 #   $4 - x86_64 架构的压缩包文件名匹配规则
@@ -129,7 +129,7 @@ check_and_update() {
         echo "${var_name}=${latest_version}" > "${DRIVE_DIR}/version.txt"
     fi
 
-    # 更新该组件的最后更新时间字段（如 UPDATED_OPENLIST、UPDATED_FILEBROWSER）
+    # 更新该组件的最后更新时间字段（如 UPDATED_OPENLIST）
     local time_var="UPDATED_${name^^}"
     if grep -q "^${time_var}=" "${DRIVE_DIR}/version.txt" 2>/dev/null; then
         sed -i "s|^${time_var}=.*|${time_var}=${now}|" "${DRIVE_DIR}/version.txt"
@@ -305,7 +305,7 @@ check_rclone_binary() {
 
 # --------------------------------------------------
 # 主流程
-# 依次检查 OpenList 和 FileBrowser
+# 依次检查 OpenList、rclone
 # --------------------------------------------------
 
 UPDATED=0
@@ -322,19 +322,6 @@ check_and_update \
 if [ $? -eq 2 ]; then
     UPDATED=2
     echo "OpenList" >> /tmp/.updated_list
-fi
-
-# 检查 FileBrowser 更新
-check_and_update \
-    "FileBrowser" \
-    "filebrowser/filebrowser" \
-    "VERSION_FILEBROWSER" \
-    "linux-amd64-filebrowser.tar.gz" \
-    "linux-arm64-filebrowser.tar.gz" \
-    "/app/filebrowser"
-if [ $? -eq 2 ]; then
-    UPDATED=2
-    echo "FileBrowser" >> /tmp/.updated_list
 fi
 
 # 检查 rclone 二进制更新
